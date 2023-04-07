@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:second_task_data_usage_todo_list/data/db.dart';
 import 'package:second_task_data_usage_todo_list/models/bloc/task_bloc.dart';
-import 'package:second_task_data_usage_todo_list/models/task.dart';
-import 'package:second_task_data_usage_todo_list/utils/app_colors.dart';
-import 'package:second_task_data_usage_todo_list/utils/app_icons.dart';
+import 'package:second_task_data_usage_todo_list/pages/add_task/widgets/add_page_app_bar.dart';
+import 'package:second_task_data_usage_todo_list/pages/add_task/widgets/name_text_field.dart';
+import 'package:second_task_data_usage_todo_list/pages/add_task/widgets/picker_fields.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 import 'package:second_task_data_usage_todo_list/widgets/app_button.dart';
 
@@ -17,161 +18,164 @@ class AddPage extends StatefulWidget {
 }
 
 class _AddPageState extends State<AddPage> {
+  TimeOfDay time = TimeOfDay.now();
+  DateTime date = DateTime.now();
+  TextEditingController nameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
-    final nameController = TextEditingController();
-    final timeController = TextEditingController();
+    final bloc = context.read<TaskBloc>();
 
-    Future displayTimePicker(BuildContext context) async {
-  var time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now());
+    void _showTimePicker() {
+      showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      ).then(
+        (value) {
+          setState(
+            () {
+              time = value ?? TimeOfDay.now();
+            },
+          );
+        },
+      );
+    }
 
-  if (time != null) {
-    setState(() {
-      timeController.text = "${time.hour}:${time.minute}";
-    });
-  }
-}
+    void _showDatePicker() {
+      showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100),
+      ).then(
+        (value) {
+          setState(
+            () {
+              date = value ?? DateTime.now();
+            },
+          );
+        },
+      );
+    }
 
     return BlocProvider(
       create: (context) => TaskBloc(),
       child: FractionallySizedBox(
         heightFactor: 0.92,
-        child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: AppColors.backgroundColor,
-            shadowColor: Colors.black.withOpacity(0.3),
-            centerTitle: true,
-            title: Text(
-              "Task",
-              style: AppTextStyles.titleStyle.copyWith(
-                color: Colors.black,
-                fontSize: 17.sp,
-              ),
-            ),
-            leadingWidth: 65.w,
-            leading: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                padding: EdgeInsets.only(left: 9.w),
-                child: Row(
+        child: BlocBuilder<TaskBloc, TaskState>(
+          builder: (context, state) {
+            return Scaffold(
+              appBar: AddPageAppBar(),
+              body: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 30.h,
+                  vertical: 37.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SvgPicture.asset(
-                      AppIcons.chevronLeftIcon,
-                      width: 12.r,
-                      height: 21.r,
+                    Text(
+                      "Add a task",
+                      style: AppTextStyles.headlineStyle,
                     ),
                     SizedBox(
-                      width: 5.w,
+                      height: 43.h,
                     ),
-                    Text(
-                      "Close",
-                      style: AppTextStyles.thinStyle.copyWith(
-                        color: AppColors.blueButtonColor,
-                        fontSize: 17.sp,
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          body: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(
-                horizontal: 30.h,
-                vertical: 37.h,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Add a task",
-                    style: AppTextStyles.headlineStyle,
-                  ),
-                  SizedBox(
-                    height: 43.h,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Name",
-                        style: AppTextStyles.buttonStyle
-                            .copyWith(fontSize: 20.sp, color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: 11.w,
-                      ),
-                      SizedBox(
-                          width: 241.h,
-                          height: 26.h,
-                          child: TextField(
+                    Row(
+                      children: [
+                        Text(
+                          "Name",
+                          style: AppTextStyles.buttonStyle.copyWith(
+                            fontSize: 20.sp,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 11.w,
+                        ),
+                        Form(
+                          key: _formKey,
+                          child: NameTextField(
                             controller: nameController,
-                          )),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Time",
-                        style: AppTextStyles.buttonStyle
-                            .copyWith(fontSize: 20.sp, color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: 22.w,
-                      ),
-                      Container(
-                        width: 86.w,
-                        height: 36.h,
-                        color: AppColors.fieldColor,
-                        child: TextField(controller: timeController,readOnly: true,onTap: () => displayTimePicker(context),),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 30.h,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Date",
-                        style: AppTextStyles.buttonStyle
-                            .copyWith(fontSize: 20.sp, color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: 22.w,
-                      ),
-                      Container(
-                        width: 163.w,
-                        height: 36.h,
-                        color: AppColors.fieldColor,
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 57.h,
-                  ),
-                  AppButton(
-                    height: 46.h,
-                    title: "Done",
-                    onTap: () {
-                      context.read<TaskBloc>().add(
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 30.h,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Time",
+                          style: AppTextStyles.buttonStyle.copyWith(
+                            fontSize: 20.sp,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 22.w,
+                        ),
+                        TimePickerField(
+                          onTap: _showTimePicker,
+                          time: time,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 30.h,
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          "Date",
+                          style: AppTextStyles.buttonStyle.copyWith(
+                            fontSize: 20.sp,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 22.w,
+                        ),
+                        DatePickerField(
+                          onTap: _showDatePicker,
+                          date: date,
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 57.h,
+                    ),
+                    AppButton(
+                      height: 46.h,
+                      title: "Done",
+                      onTap: () {
+                        if (_formKey.currentState!.validate()) {
+                          bloc.add(
                             AddTask(
                               task: Task(
                                 title: nameController.text,
-                                time: timeController.text,
-                                date: "2023",
+                                time: time.format(context),
+                                date: DateFormat('dd.MM.yyyy').format(date),
+                                isCompleted: false,
                               ),
                             ),
                           );
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              )),
+                          bloc.add(
+                            SortList(
+                              sortType: state.sortType,
+                            ),
+                          );
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

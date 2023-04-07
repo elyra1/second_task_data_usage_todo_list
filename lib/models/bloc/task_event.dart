@@ -7,6 +7,13 @@ abstract class TaskEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class InitialLoad extends TaskEvent {
+  const InitialLoad();
+
+  @override
+  List<Object> get props => [];
+}
+
 class AddTask extends TaskEvent {
   final Task task;
 
@@ -23,3 +30,18 @@ class UpdateTask extends TaskEvent {
   List<Object> get props => [task];
 }
 
+class UpdateSortType extends TaskEvent {
+  final SortType sortType;
+  const UpdateSortType({required this.sortType});
+
+  @override
+  List<Object> get props => [sortType];
+}
+
+class SortList extends TaskEvent {
+  final SortType sortType;
+  const SortList({required this.sortType});
+
+  @override
+  List<Object> get props => [sortType];
+}

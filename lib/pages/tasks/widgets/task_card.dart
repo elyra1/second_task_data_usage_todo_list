@@ -1,28 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:second_task_data_usage_todo_list/data/db.dart';
 import 'package:second_task_data_usage_todo_list/models/bloc/task_bloc.dart';
-import 'package:second_task_data_usage_todo_list/models/task.dart';
+import 'package:second_task_data_usage_todo_list/models/sort_type.dart';
 import 'package:second_task_data_usage_todo_list/pages/tasks/widgets/app_check_box.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 
-
 class TaskCard extends StatelessWidget {
   final Task task;
+  final SortType sortType;
   const TaskCard({
     Key? key,
     required this.task,
+    required this.sortType,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final bloc = context.read<TaskBloc>();
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         BlocProvider(
           create: (context) => TaskBloc(),
           child: AppCheckBox(
-            onTap: () => context.read<TaskBloc>().add(UpdateTask(task: task)),
+            onTap: () {
+              bloc.add(
+                UpdateTask(task: task),
+              );
+              bloc.add(
+                SortList(sortType: sortType),
+              );
+            },
             isCompleted: task.isCompleted,
           ),
         ),
