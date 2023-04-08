@@ -5,9 +5,12 @@ import 'package:second_task_data_usage_todo_list/utils/app_colors.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_icons.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 
-class AddPageAppBar extends AppBar {
-  AddPageAppBar({super.key});
+class AddPageAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const AddPageAppBar({
+    super.key,
+  });
 
+  @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: AppColors.backgroundColor,
@@ -20,7 +23,7 @@ class AddPageAppBar extends AppBar {
           fontSize: 17.sp,
         ),
       ),
-      leadingWidth: 65.w,
+      leadingWidth: 69.w,
       leading: GestureDetector(
         onTap: () => Navigator.of(context).pop(),
         child: Container(
@@ -48,4 +51,8 @@ class AddPageAppBar extends AppBar {
       ),
     );
   }
+
+  static final _appBar = AppBar();
+  @override
+  Size get preferredSize => _appBar.preferredSize;
 }

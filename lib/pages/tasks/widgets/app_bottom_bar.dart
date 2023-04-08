@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:second_task_data_usage_todo_list/models/bloc/task_bloc.dart';
+import 'package:second_task_data_usage_todo_list/bloc/task_bloc.dart';
 import 'package:second_task_data_usage_todo_list/models/sort_type.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_icons.dart';
 

@@ -20,36 +20,25 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
   Future<void> _onInitialLoad(
       InitialLoad event, Emitter<TaskState> emit) async {
-    final completedTasks = await (db.allTasks
-      ..then(
-        (value) => value.where((element) => element.isCompleted == true),
-      ));
-    final uncompletedTasks = await (db.allTasks
-      ..then(
-        (value) => value.where((element) => element.isCompleted == false),
-      ));
+    final tasks = await db.allTasks;
+    final completedTasks =
+        tasks.where((element) => element.isCompleted == true).toList();
+    final uncompletedTasks =
+        tasks.where((element) => element.isCompleted == false).toList();
 
-    if (completedTasks.isNotEmpty && uncompletedTasks.isNotEmpty) {
-      emit(
-        TaskState(
-          completedTasks: completedTasks,
-          uncompletedTasks: uncompletedTasks,
-        ),
-      );
-    }
+    emit(
+      TaskState(
+        completedTasks: completedTasks.isEmpty ? [] : completedTasks,
+        uncompletedTasks: uncompletedTasks.isEmpty ? [] : uncompletedTasks,
+        sortType: state.sortType,
+      ),
+    );
   }
 
   Future<void> _onAddTask(AddTask event, Emitter<TaskState> emit) async {
     final state = this.state;
     final task = event.task;
-    emit(
-      TaskState(
-        completedTasks: state.completedTasks,
-        uncompletedTasks: List.from(state.uncompletedTasks)..add(task),
-        sortType: state.sortType,
-      ),
-    );
-    db.addTask(
+    int id = await db.addTask(
       TasksCompanion(
         title: Value(task.title),
         time: Value(task.time),
@@ -57,18 +46,41 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         isCompleted: Value(task.isCompleted),
       ),
     );
+    emit(
+      TaskState(
+        completedTasks: state.completedTasks,
+        uncompletedTasks: List.from(state.uncompletedTasks)
+          ..add(
+            task.copyWith(
+              id: id,
+            ),
+          ),
+        sortType: state.sortType,
+      ),
+    );
   }
 
-  Future<void> _onUpdateTask(UpdateTask event, Emitter<TaskState> emit) async {
+  void _onUpdateTask(UpdateTask event, Emitter<TaskState> emit) {
     final state = this.state;
     final task = event.task;
+    db.updateTask(
+      TasksCompanion(
+        id: Value(task.id),
+        title: Value(task.title),
+        time: Value(task.time),
+        date: Value(task.date),
+        isCompleted: Value(!task.isCompleted),
+      ),
+    );
     if (task.isCompleted) {
       emit(
         TaskState(
           completedTasks: List.from(state.completedTasks)..remove(task),
           uncompletedTasks: List.from(state.uncompletedTasks)
             ..add(
-              task.copyWith(isCompleted: false),
+              task.copyWith(
+                isCompleted: false,
+              ),
             ),
           sortType: state.sortType,
         ),
@@ -87,17 +99,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         ),
       );
     }
-    db.updateTask(
-      TasksCompanion(
-        title: Value(task.title),
-        time: Value(task.time),
-        date: Value(task.date),
-        isCompleted: Value(!task.isCompleted),
-      ),
-    );
   }
 
-  void _onSortList(SortList event, Emitter<TaskState> emit) {
+  Future<void> _onSortList(SortList event, Emitter<TaskState> emit) async {
     final state = this.state;
     final SortType sortType = state.sortType;
     List<Task> completedTasks = List.from(state.completedTasks);
@@ -137,7 +141,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         TaskState(
           completedTasks: completedTasks.toList(),
           uncompletedTasks: uncompletedTasks.toList(),
-          sortType: state.sortType,
+          sortType: sortType,
         ),
       );
     } else {
@@ -169,7 +173,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         TaskState(
           completedTasks: completedTasks.toList(),
           uncompletedTasks: uncompletedTasks.toList(),
-          sortType: state.sortType,
+          sortType: sortType,
         ),
       );
     }

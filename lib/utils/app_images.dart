@@ -1,3 +1,3 @@
-abstract class AppImages{
-  static const String curveArrow = "assets/images/curve_arrow.png";
+abstract class AppImages {
+  static const String curveArrow = "assets/images/curve_arrow.svg";
 }

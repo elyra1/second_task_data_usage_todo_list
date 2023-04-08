@@ -11,5 +11,9 @@ class TaskState extends Equatable {
   });
 
   @override
-  List<Object> get props => [completedTasks, uncompletedTasks, sortType];
+  List<Object> get props => [
+        completedTasks,
+        uncompletedTasks,
+        sortType,
+      ];
 }

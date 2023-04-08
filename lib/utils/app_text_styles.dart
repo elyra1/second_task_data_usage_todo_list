@@ -20,8 +20,16 @@ abstract class AppTextStyles {
     letterSpacing: -0.24.w,
   );
 
-  static TextStyle titleCompletedStyle = titleStyle.copyWith(decoration: TextDecoration.lineThrough, color: AppColors.grey.withOpacity(0.3));
-  static TextStyle subtitleCompletedStyle = subtitleStyle.copyWith(decoration: TextDecoration.lineThrough, color: AppColors.grey.withOpacity(0.3));
+  static TextStyle titleCompletedStyle = titleStyle.copyWith(
+    decoration: TextDecoration.lineThrough,
+    color: AppColors.grey.withOpacity(0.3),
+  );
+
+  static TextStyle subtitleCompletedStyle = subtitleStyle.copyWith(
+    decoration: TextDecoration.lineThrough,
+    color: AppColors.grey.withOpacity(0.3),
+  );
+
   static TextStyle buttonStyle = TextStyle(
     color: Colors.white,
     fontSize: 14.sp,

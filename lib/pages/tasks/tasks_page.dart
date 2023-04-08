@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:second_task_data_usage_todo_list/models/bloc/task_bloc.dart';
+import 'package:second_task_data_usage_todo_list/bloc/task_bloc.dart';
 import 'package:second_task_data_usage_todo_list/pages/add_task/add_page.dart';
 import 'package:second_task_data_usage_todo_list/pages/info/info_page.dart';
 import 'package:second_task_data_usage_todo_list/pages/tasks/tasks_list.dart';
 import 'package:second_task_data_usage_todo_list/pages/tasks/widgets/app_bottom_bar.dart';
+import 'package:second_task_data_usage_todo_list/pages/tasks/widgets/no_tasks_column.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_colors.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_icons.dart';
 import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 
 class TasksPage extends StatefulWidget {
-  const TasksPage({Key? key}) : super(key: key);
+  const TasksPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<TasksPage> createState() => _TasksPageState();
@@ -23,19 +26,35 @@ class _TasksPageState extends State<TasksPage> {
   void initState() {
     super.initState();
     final bloc = BlocProvider.of<TaskBloc>(context);
-    bloc.add(InitialLoad());
+    bloc.add(
+      const InitialLoad(),
+    );
+    bloc.add(
+      SortList(sortType: bloc.state.sortType),
+    );
   }
 
   bool isCompletedHidden = false;
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<TaskBloc, TaskState>(
+    return BlocConsumer<TaskBloc, TaskState>(
+      listener: (context, state) {
+        context.read<TaskBloc>().add(
+              SortList(
+                sortType: state.sortType,
+              ),
+            );
+      },
       builder: (context, state) => Scaffold(
         backgroundColor: AppColors.backgroundColor,
         body: SafeArea(
           child: Stack(
             children: [
               CustomScrollView(
+                physics: (state.completedTasks.isEmpty &&
+                        state.uncompletedTasks.isEmpty)
+                    ? const NeverScrollableScrollPhysics()
+                    : const ScrollPhysics(),
                 slivers: [
                   SliverAppBar(
                     backgroundColor: AppColors.backgroundColor,
@@ -82,12 +101,14 @@ class _TasksPageState extends State<TasksPage> {
                         left: 27.w,
                         right: 14.w,
                       ),
-                      child: TasksList(
-                        completedTasks: state.completedTasks,
-                        uncompletedTasks: state.uncompletedTasks,
-                        isCompletedHidden: isCompletedHidden,
-                        sortType: state.sortType,
-                      ),
+                      child: !(state.completedTasks.isEmpty &&
+                              state.uncompletedTasks.isEmpty)
+                          ? TasksList(
+                              completedTasks: state.completedTasks,
+                              uncompletedTasks: state.uncompletedTasks,
+                              isCompletedHidden: isCompletedHidden,
+                            )
+                          : const NoTasksColumn(),
                     ),
                   ),
                 ],
@@ -115,7 +136,9 @@ class _TasksPageState extends State<TasksPage> {
                       onTap: () => showModalBottomSheet(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(10.r),
+                            top: Radius.circular(
+                              10.r,
+                            ),
                           ),
                         ),
                         clipBehavior: Clip.antiAliasWithSaveLayer,

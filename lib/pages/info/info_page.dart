@@ -5,7 +5,9 @@ import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 import 'package:second_task_data_usage_todo_list/widgets/app_button.dart';
 
 class InfoPage extends StatelessWidget {
-  const InfoPage({Key? key}) : super(key: key);
+  const InfoPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,8 +15,12 @@ class InfoPage extends StatelessWidget {
       backgroundColor: AppColors.backgroundColor,
       body: SafeArea(
         child: Container(
-          padding:
-              EdgeInsets.only(left: 27.w, top: 23.h, bottom: 41.h, right: 14.w),
+          padding: EdgeInsets.only(
+            left: 27.w,
+            top: 23.h,
+            bottom: 41.h,
+            right: 14.w,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -34,7 +40,10 @@ class InfoPage extends StatelessWidget {
               AppButton(
                 height: 46.h,
                 title: 'Got it!',
-                margin: EdgeInsets.only(left: 3.w, right: 16.w),
+                margin: EdgeInsets.only(
+                  left: 3.w,
+                  right: 16.w,
+                ),
                 onTap: () => Navigator.of(context).pop(),
               ),
             ],
@@ -44,5 +53,3 @@ class InfoPage extends StatelessWidget {
     );
   }
 }
-
-

@@ -8,6 +8,7 @@ class AppButton extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final String title;
   final double height;
+
   const AppButton({
     required this.height,
     this.margin,
@@ -24,8 +25,11 @@ class AppButton extends StatelessWidget {
         margin: margin,
         height: height,
         decoration: BoxDecoration(
-            color: AppColors.buttonColor,
-            borderRadius: BorderRadius.circular(12.r)),
+          color: AppColors.buttonColor,
+          borderRadius: BorderRadius.circular(
+            12.r,
+          ),
+        ),
         child: Center(
           child: Text(
             title,

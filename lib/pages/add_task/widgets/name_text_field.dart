@@ -4,7 +4,10 @@ import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 
 class NameTextField extends StatelessWidget {
   final TextEditingController controller;
-  const NameTextField({Key? key, required this.controller}) : super(key: key);
+  const NameTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,7 @@ class NameTextField extends StatelessWidget {
           errorStyle: AppTextStyles.thinStyle.copyWith(
             fontSize: 10.sp,
             color: Colors.red,
-            height: 0.5.h,
+            height: 0.9.h,
           ),
         ),
         validator: (value) {

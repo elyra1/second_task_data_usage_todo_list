@@ -8,6 +8,15 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $TasksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
@@ -36,7 +45,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
             SqlDialect.postgres: '',
           }));
   @override
-  List<GeneratedColumn> get $columns => [title, time, date, isCompleted];
+  List<GeneratedColumn> get $columns => [id, title, time, date, isCompleted];
   @override
   String get aliasedName => _alias ?? 'tasks';
   @override
@@ -46,6 +55,9 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
     if (data.containsKey('title')) {
       context.handle(
           _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
@@ -76,11 +88,13 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => const {};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
   Task map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Task(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       title: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
       time: attachedDatabase.typeMapping
@@ -99,18 +113,21 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
 }
 
 class Task extends DataClass implements Insertable<Task> {
+  final int id;
   final String title;
   final String time;
   final String date;
   final bool isCompleted;
   const Task(
-      {required this.title,
+      {required this.id,
+      required this.title,
       required this.time,
       required this.date,
       required this.isCompleted});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
     map['title'] = Variable<String>(title);
     map['time'] = Variable<String>(time);
     map['date'] = Variable<String>(date);
@@ -120,6 +137,7 @@ class Task extends DataClass implements Insertable<Task> {
 
   TasksCompanion toCompanion(bool nullToAbsent) {
     return TasksCompanion(
+      id: Value(id),
       title: Value(title),
       time: Value(time),
       date: Value(date),
@@ -131,6 +149,7 @@ class Task extends DataClass implements Insertable<Task> {
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Task(
+      id: serializer.fromJson<int>(json['id']),
       title: serializer.fromJson<String>(json['title']),
       time: serializer.fromJson<String>(json['time']),
       date: serializer.fromJson<String>(json['date']),
@@ -141,6 +160,7 @@ class Task extends DataClass implements Insertable<Task> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
       'title': serializer.toJson<String>(title),
       'time': serializer.toJson<String>(time),
       'date': serializer.toJson<String>(date),
@@ -149,8 +169,13 @@ class Task extends DataClass implements Insertable<Task> {
   }
 
   Task copyWith(
-          {String? title, String? time, String? date, bool? isCompleted}) =>
+          {int? id,
+          String? title,
+          String? time,
+          String? date,
+          bool? isCompleted}) =>
       Task(
+        id: id ?? this.id,
         title: title ?? this.title,
         time: time ?? this.time,
         date: date ?? this.date,
@@ -159,6 +184,7 @@ class Task extends DataClass implements Insertable<Task> {
   @override
   String toString() {
     return (StringBuffer('Task(')
+          ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('time: $time, ')
           ..write('date: $date, ')
@@ -168,11 +194,12 @@ class Task extends DataClass implements Insertable<Task> {
   }
 
   @override
-  int get hashCode => Object.hash(title, time, date, isCompleted);
+  int get hashCode => Object.hash(id, title, time, date, isCompleted);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Task &&
+          other.id == this.id &&
           other.title == this.title &&
           other.time == this.time &&
           other.date == this.date &&
@@ -180,62 +207,65 @@ class Task extends DataClass implements Insertable<Task> {
 }
 
 class TasksCompanion extends UpdateCompanion<Task> {
+  final Value<int> id;
   final Value<String> title;
   final Value<String> time;
   final Value<String> date;
   final Value<bool> isCompleted;
-  final Value<int> rowid;
   const TasksCompanion({
+    this.id = const Value.absent(),
     this.title = const Value.absent(),
     this.time = const Value.absent(),
     this.date = const Value.absent(),
     this.isCompleted = const Value.absent(),
-    this.rowid = const Value.absent(),
   });
   TasksCompanion.insert({
+    this.id = const Value.absent(),
     required String title,
     required String time,
     required String date,
     required bool isCompleted,
-    this.rowid = const Value.absent(),
   })  : title = Value(title),
         time = Value(time),
         date = Value(date),
         isCompleted = Value(isCompleted);
   static Insertable<Task> custom({
+    Expression<int>? id,
     Expression<String>? title,
     Expression<String>? time,
     Expression<String>? date,
     Expression<bool>? isCompleted,
-    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
       if (title != null) 'title': title,
       if (time != null) 'time': time,
       if (date != null) 'date': date,
       if (isCompleted != null) 'is_completed': isCompleted,
-      if (rowid != null) 'rowid': rowid,
     });
   }
 
   TasksCompanion copyWith(
-      {Value<String>? title,
+      {Value<int>? id,
+      Value<String>? title,
       Value<String>? time,
       Value<String>? date,
-      Value<bool>? isCompleted,
-      Value<int>? rowid}) {
+      Value<bool>? isCompleted}) {
     return TasksCompanion(
+      id: id ?? this.id,
       title: title ?? this.title,
       time: time ?? this.time,
       date: date ?? this.date,
       isCompleted: isCompleted ?? this.isCompleted,
-      rowid: rowid ?? this.rowid,
     );
   }
 
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
     }
@@ -248,20 +278,17 @@ class TasksCompanion extends UpdateCompanion<Task> {
     if (isCompleted.present) {
       map['is_completed'] = Variable<bool>(isCompleted.value);
     }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
     return map;
   }
 
   @override
   String toString() {
     return (StringBuffer('TasksCompanion(')
+          ..write('id: $id, ')
           ..write('title: $title, ')
           ..write('time: $time, ')
           ..write('date: $date, ')
-          ..write('isCompleted: $isCompleted, ')
-          ..write('rowid: $rowid')
+          ..write('isCompleted: $isCompleted')
           ..write(')'))
         .toString();
   }

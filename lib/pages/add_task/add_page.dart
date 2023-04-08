@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:second_task_data_usage_todo_list/data/db.dart';
-import 'package:second_task_data_usage_todo_list/models/bloc/task_bloc.dart';
+import 'package:second_task_data_usage_todo_list/bloc/task_bloc.dart';
 import 'package:second_task_data_usage_todo_list/pages/add_task/widgets/add_page_app_bar.dart';
 import 'package:second_task_data_usage_todo_list/pages/add_task/widgets/name_text_field.dart';
 import 'package:second_task_data_usage_todo_list/pages/add_task/widgets/picker_fields.dart';
@@ -11,7 +11,9 @@ import 'package:second_task_data_usage_todo_list/utils/app_text_styles.dart';
 import 'package:second_task_data_usage_todo_list/widgets/app_button.dart';
 
 class AddPage extends StatefulWidget {
-  const AddPage({Key? key}) : super(key: key);
+  const AddPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<AddPage> createState() => _AddPageState();
@@ -27,7 +29,7 @@ class _AddPageState extends State<AddPage> {
   Widget build(BuildContext context) {
     final bloc = context.read<TaskBloc>();
 
-    void _showTimePicker() {
+    void showAppTimePicker() {
       showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
@@ -42,7 +44,7 @@ class _AddPageState extends State<AddPage> {
       );
     }
 
-    void _showDatePicker() {
+    void showAppDataPicker() {
       showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -66,7 +68,7 @@ class _AddPageState extends State<AddPage> {
         child: BlocBuilder<TaskBloc, TaskState>(
           builder: (context, state) {
             return Scaffold(
-              appBar: AddPageAppBar(),
+              appBar: const AddPageAppBar(),
               body: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
                   horizontal: 30.h,
@@ -118,7 +120,7 @@ class _AddPageState extends State<AddPage> {
                           width: 22.w,
                         ),
                         TimePickerField(
-                          onTap: _showTimePicker,
+                          onTap: showAppTimePicker,
                           time: time,
                         ),
                       ],
@@ -139,7 +141,7 @@ class _AddPageState extends State<AddPage> {
                           width: 22.w,
                         ),
                         DatePickerField(
-                          onTap: _showDatePicker,
+                          onTap: showAppDataPicker,
                           date: date,
                         ),
                       ],
@@ -155,16 +157,12 @@ class _AddPageState extends State<AddPage> {
                           bloc.add(
                             AddTask(
                               task: Task(
+                                id: -1,
                                 title: nameController.text,
                                 time: time.format(context),
                                 date: DateFormat('dd.MM.yyyy').format(date),
                                 isCompleted: false,
                               ),
-                            ),
-                          );
-                          bloc.add(
-                            SortList(
-                              sortType: state.sortType,
                             ),
                           );
                           Navigator.of(context).pop();

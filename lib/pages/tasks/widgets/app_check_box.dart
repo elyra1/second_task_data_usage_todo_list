@@ -10,7 +10,6 @@ class AppCheckBox extends StatelessWidget {
     this.onTap,
     required this.isCompleted,
   });
-  
 
   @override
   Widget build(BuildContext context) {
@@ -20,15 +19,24 @@ class AppCheckBox extends StatelessWidget {
         height: 20.r,
         width: 20.r,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6.r),
-          color: isCompleted? Colors.black:Colors.white,
+          borderRadius: BorderRadius.circular(
+            6.r,
+          ),
+          color: isCompleted ? Colors.black : Colors.white,
           border: Border.all(
-            color: isCompleted? Colors.black:AppColors.borderColor,
+            color: isCompleted ? Colors.black : AppColors.borderColor,
             width: 2.sp,
           ),
-        
         ),
-        child: isCompleted ? Center(child: Icon(Icons.check, color: Colors.white,size: 16.r,)) : null,
+        child: isCompleted
+            ? Center(
+                child: Icon(
+                  Icons.check,
+                  color: Colors.white,
+                  size: 16.r,
+                ),
+              )
+            : null,
       ),
     );
   }

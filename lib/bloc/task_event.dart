@@ -19,7 +19,9 @@ class AddTask extends TaskEvent {
 
   const AddTask({required this.task});
   @override
-  List<Object> get props => [task];
+  List<Object> get props => [
+        task,
+      ];
 }
 
 class UpdateTask extends TaskEvent {
@@ -27,7 +29,9 @@ class UpdateTask extends TaskEvent {
 
   const UpdateTask({required this.task});
   @override
-  List<Object> get props => [task];
+  List<Object> get props => [
+        task,
+      ];
 }
 
 class UpdateSortType extends TaskEvent {
@@ -35,7 +39,9 @@ class UpdateSortType extends TaskEvent {
   const UpdateSortType({required this.sortType});
 
   @override
-  List<Object> get props => [sortType];
+  List<Object> get props => [
+        sortType,
+      ];
 }
 
 class SortList extends TaskEvent {
@@ -43,5 +49,7 @@ class SortList extends TaskEvent {
   const SortList({required this.sortType});
 
   @override
-  List<Object> get props => [sortType];
+  List<Object> get props => [
+        sortType,
+      ];
 }
